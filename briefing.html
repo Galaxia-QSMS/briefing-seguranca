@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Briefing de Segurança | Galáxia Navegação</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(
+                135deg,
+                #061b3a,
+                #0b3768,
+                #0d4d87
+            );
+            min-height: 100vh;
+            padding: 30px 15px;
+            color: #1f2937;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: block;
+            width: auto;
+            max-width: 210px;
+            max-height: 90px;
+            margin: 0 auto 20px auto;
+            object-fit: contain;
+        }
+
+        h1 {
+            color: #062d59;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .subtitulo {
+            color: #64748b;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .embarcacao {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .embarcacao span {
+            display: inline-block;
+            background: #eaf4fb;
+            color: #07569b;
+            padding: 9px 18px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .aviso {
+            background: #f0f7fc;
+            border-left: 4px solid #0d72b9;
+            padding: 15px;
+            border-radius: 7px;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .botao {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #94a3b8;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: not-allowed;
+            transition: 0.2s;
+        }
+
+        .botao.liberado {
+            background: linear-gradient(
+                135deg,
+                #07569b,
+                #0d72b9
+            );
+            cursor: pointer;
+        }
+
+        .botao.liberado:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(7, 86, 155, 0.25);
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 12px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 25px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .logo {
+                max-width: 180px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <div class="card">
+
+            <div class="header">
+
+                <img
+                    src="./logo-galaxia.png"
+                    class="logo"
+                    alt="Galáxia Navegação"
+                >
+
+                <h1>
+                    Briefing de Segurança
+                </h1>
+
+                <p class="subtitulo">
+                    Assista ao briefing de segurança da embarcação
+                    antes de prosseguir.
+                </p>
+
+            </div>
+
+
+            <div class="embarcacao">
+
+                <span id="nomeEmbarcacao">
+                    Carregando embarcação...
+                </span>
+
+            </div>
+
+
+            <div class="video-container">
+
+                <iframe
+                    id="video"
+                    src=""
+                    title="Briefing de Segurança"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen
+                ></iframe>
+
+            </div>
+
+
+            <div class="aviso">
+
+                🔒
+                <strong>Atenção:</strong>
+                assista ao vídeo completo do Briefing de Segurança.
+                O botão para concluir será liberado somente após
+                o término do vídeo.
+
+            </div>
+
+
+            <button
+                id="botaoConcluir"
+                class="botao"
+                disabled
+            >
+                CONCLUIR BRIEFING
+            </button>
+
+
+            <div
+                id="status"
+                class="status"
+            >
+                Aguarde o término do vídeo para continuar.
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // ==================================================
+        // RECEBE A EMBARCAÇÃO ENVIADA PELO INDEX
+        // ==================================================
+
+        const parametros =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const embarcacao =
+            parametros.get("embarcacao");
+
+
+        // ==================================================
+        // ELEMENTOS DA PÁGINA
+        // ==================================================
+
+        const nomeEmbarcacao =
+            document.getElementById(
+                "nomeEmbarcacao"
+            );
+
+        const video =
+            document.getElementById(
+                "video"
+            );
+
+        const botaoConcluir =
+            document.getElementById(
+                "botaoConcluir"
+            );
+
+        const status =
+            document.getElementById(
+                "status"
+            );
+
+
+        // ==================================================
+        // VÍDEOS DAS EMBARCAÇÕES
+        // ==================================================
+        //
+        // POR ENQUANTO SÃO LINKS DE TESTE.
+        //
+        // DEPOIS VAMOS COLOCAR OS LINKS REAIS
+        // DOS VÍDEOS DE CADA EMBARCAÇÃO.
+        //
+        // ==================================================
+
+        const videos = {
+
+            "Atlas Z":
+                "https://www.youtube.com/embed/VIDEO_ATLAS",
+
+            "Theseus Z":
+                "https://www.youtube.com/embed/VIDEO_THESEUS",
+
+            "Apollo Z":
+                "https://www.youtube.com/embed/VIDEO_APOLLO",
+
+            "Captain Nicholas Z":
+                "https://www.youtube.com/embed/VIDEO_NICHOLAS",
+
+            "GNL 1015":
+                "https://www.youtube.com/embed/VIDEO_GNL"
+
+        };
+
+
+        // ==================================================
+        // VERIFICA EMBARCAÇÃO
+        // ==================================================
+
+        if (!embarcacao) {
+
+            nomeEmbarcacao.textContent =
+                "Embarcação não informada";
+
+            status.textContent =
+                "Não foi possível identificar a embarcação.";
+
+        } else {
+
+            nomeEmbarcacao.textContent =
+                embarcacao;
+
+
+            // ==================================================
+            // CARREGA O VÍDEO CORRESPONDENTE
+            // ==================================================
+
+            if (videos[embarcacao]) {
+
+                video.src =
+                    videos[embarcacao] +
+                    "?rel=0";
+
+            } else {
+
+                status.textContent =
+                    "Vídeo não cadastrado para esta embarcação.";
+
+            }
+
+        }
+
+
+        // ==================================================
+        // TEMPORÁRIO
+        // ==================================================
+        //
+        // Nesta primeira versão, o botão será liberado
+        // para testarmos o funcionamento da página.
+        //
+        // Depois vamos integrar o controle real do vídeo
+        // para liberar somente quando ele terminar.
+        //
+        // ==================================================
+
+        setTimeout(function () {
+
+            botaoConcluir.disabled = false;
+
+            botaoConcluir.classList.add(
+                "liberado"
+            );
+
+            status.textContent =
+                "Vídeo finalizado. Você pode concluir o briefing.";
+
+        }, 5000);
+
+
+        // ==================================================
+        // CONCLUIR
+        // ==================================================
+
+        botaoConcluir.addEventListener(
+            "click",
+            function () {
+
+                alert(
+                    "Briefing concluído com sucesso!"
+                );
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
