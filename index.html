@@ -23,6 +23,7 @@
         body {
             font-family: Arial, Helvetica, sans-serif;
             min-height: 100vh;
+
             background: linear-gradient(
                 135deg,
                 #06152f 0%,
@@ -52,6 +53,7 @@
                 0 20px 50px rgba(0, 0, 0, 0.30);
         }
 
+
         /* =========================
            CABEÇALHO
         ========================= */
@@ -62,12 +64,15 @@
         }
 
         .logo {
-            max-width: 190px;
-            max-height: 80px;
+            display: block;
+
+            width: auto;
+            max-width: 210px;
+            max-height: 95px;
 
             object-fit: contain;
 
-            margin-bottom: 20px;
+            margin: 0 auto 22px auto;
         }
 
         .header h1 {
@@ -86,6 +91,7 @@
             line-height: 1.5;
         }
 
+
         /* =========================
            TÍTULO DA SEÇÃO
         ========================= */
@@ -103,6 +109,7 @@
 
             border-bottom: 2px solid #edf1f5;
         }
+
 
         /* =========================
            CAMPOS
@@ -159,6 +166,7 @@
             cursor: pointer;
         }
 
+
         /* =========================
            BOTÃO
         ========================= */
@@ -197,6 +205,7 @@
             transform: translateY(0);
         }
 
+
         /* =========================
            AVISO
         ========================= */
@@ -219,24 +228,9 @@
             text-align: center;
         }
 
-        /* =========================
-           RODAPÉ
-        ========================= */
-
-        .footer {
-            margin-top: 18px;
-
-            color: rgba(255, 255, 255, 0.65);
-
-            font-size: 11px;
-
-            text-align: center;
-
-            line-height: 1.5;
-        }
 
         /* =========================
-           ERRO CPF
+           ERRO
         ========================= */
 
         .error {
@@ -248,6 +242,7 @@
 
             font-size: 12px;
         }
+
 
         /* =========================
            CELULAR
@@ -267,6 +262,10 @@
 
             .header h1 {
                 font-size: 23px;
+            }
+
+            .logo {
+                max-width: 180px;
             }
 
         }
@@ -291,28 +290,27 @@
 
             <div class="header">
 
-                <!--
-                    Quando tivermos a logo,
-                    vamos colocar aqui.
 
-                    Exemplo:
+                <!-- LOGO -->
 
-                    <img
-                        src="logo-galaxia.png"
-                        class="logo"
-                        alt="Galáxia Navegação"
-                    >
-                -->
+                <img
+                    src="logo-galaxia.png"
+                    class="logo"
+                    alt="Galáxia Navegação"
+                >
+
 
                 <h1>
                     Briefing de Segurança
                 </h1>
+
 
                 <p>
                     Antes de acessar a embarcação,
                     preencha seus dados e assista ao
                     Briefing de Segurança correspondente.
                 </p>
+
 
             </div>
 
@@ -326,7 +324,10 @@
             </div>
 
 
-            <form id="briefingForm">
+            <form
+                id="briefingForm"
+                novalidate
+            >
 
 
                 <!-- NOME -->
@@ -396,7 +397,7 @@
                 </div>
 
 
-                <!-- MOTIVO DA VISITA -->
+                <!-- MOTIVO -->
 
                 <div class="form-group">
 
@@ -415,7 +416,7 @@
                 </div>
 
 
-                <!-- DATA DA VISITA -->
+                <!-- DATA -->
 
                 <div class="form-group">
 
@@ -505,31 +506,34 @@
         </div>
 
 
-        <!-- =========================
-             RODAPÉ
-        ========================= -->
-
-        <div class="footer">
-
-            Galáxia Navegação<br>
-
-            Proteção não é opção, é padrão Galáxia.
-
-        </div>
-
-
     </div>
 
 
     <script>
 
         /* ==========================================
-           MÁSCARA DE CPF
+           ELEMENTOS
         ========================================== */
 
-        const cpfInput =
-            document.getElementById("cpf");
+        const form =
+            document.getElementById(
+                "briefingForm"
+            );
 
+        const cpfInput =
+            document.getElementById(
+                "cpf"
+            );
+
+        const cpfError =
+            document.getElementById(
+                "cpfError"
+            );
+
+
+        /* ==========================================
+           MÁSCARA CPF
+        ========================================== */
 
         cpfInput.addEventListener(
             "input",
@@ -575,12 +579,14 @@
 
                 this.value = value;
 
+                cpfError.style.display = "none";
+
             }
         );
 
 
         /* ==========================================
-           VALIDAÇÃO DE CPF
+           VALIDAÇÃO CPF
         ========================================== */
 
         function validarCPF(cpf) {
@@ -670,14 +676,54 @@
 
 
         /* ==========================================
-           FORMULÁRIO
+           VERIFICAÇÃO DOS CAMPOS
         ========================================== */
 
-        const form =
-            document.getElementById(
-                "briefingForm"
-            );
+        function validarFormulario() {
 
+            const campos =
+                form.querySelectorAll(
+                    "input[required], select[required]"
+                );
+
+
+            for (const campo of campos) {
+
+                if (
+                    campo.value.trim() === ""
+                ) {
+
+                    campo.focus();
+
+                    campo.reportValidity();
+
+                    return false;
+
+                }
+
+            }
+
+
+            if (!validarCPF(cpfInput.value)) {
+
+                cpfError.style.display =
+                    "block";
+
+                cpfInput.focus();
+
+                return false;
+
+            }
+
+
+            return true;
+
+        }
+
+
+        /* ==========================================
+           ENVIO
+        ========================================== */
 
         form.addEventListener(
             "submit",
@@ -686,43 +732,11 @@
                 event.preventDefault();
 
 
-                const cpfError =
-                    document.getElementById(
-                        "cpfError"
-                    );
-
-
-                const cpf =
-                    cpfInput.value;
-
-
-                if (!validarCPF(cpf)) {
-
-                    cpfError.style.display =
-                        "block";
-
-                    cpfInput.focus();
+                if (!validarFormulario()) {
 
                     return;
 
                 }
-
-
-                cpfError.style.display =
-                    "none";
-
-
-                /*
-                    POR ENQUANTO NÃO ENVIAREMOS
-                    OS DADOS PARA LUGAR NENHUM.
-
-                    Na próxima etapa vamos:
-
-                    1. Guardar os dados;
-                    2. Identificar a embarcação;
-                    3. Abrir o vídeo correspondente;
-                    4. Controlar o término do vídeo.
-                */
 
 
                 const dados = {
@@ -730,20 +744,20 @@
                     nome:
                         document.getElementById(
                             "nome"
-                        ).value,
+                        ).value.trim(),
 
                     cpf:
-                        cpf,
+                        cpfInput.value,
 
                     empresa:
                         document.getElementById(
                             "empresa"
-                        ).value,
+                        ).value.trim(),
 
                     motivo:
                         document.getElementById(
                             "motivo"
-                        ).value,
+                        ).value.trim(),
 
                     dataVisita:
                         document.getElementById(
@@ -764,8 +778,17 @@
                 );
 
 
+                /*
+                    PRÓXIMA ETAPA:
+
+                    Os dados serão enviados para a
+                    etapa do vídeo correspondente
+                    à embarcação selecionada.
+                */
+
+
                 alert(
-                    "Cadastro preenchido com sucesso!"
+                    "Dados preenchidos corretamente!"
                 );
 
             }
