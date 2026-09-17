@@ -205,7 +205,9 @@
                     alt="Galáxia Navegação"
                 >
 
-                <h1>Briefing de Segurança</h1>
+                <h1>
+                    Briefing de Segurança
+                </h1>
 
                 <p class="subtitle">
                     Antes de acessar a embarcação, preencha seus dados
@@ -398,207 +400,348 @@
 
     <script>
 
-        // ================================
+        // ==========================================
         // MÁSCARA DE CPF
-        // ================================
+        // ==========================================
 
-        const cpfInput = document.getElementById("cpf");
+        const cpfInput =
+            document.getElementById("cpf");
 
-        cpfInput.addEventListener("input", function () {
 
-            let cpf = this.value.replace(/\D/g, "");
+        cpfInput.addEventListener(
+            "input",
+            function () {
 
-            if (cpf.length > 11) {
-                cpf = cpf.substring(0, 11);
+                let cpf =
+                    this.value.replace(/\D/g, "");
+
+
+                if (cpf.length > 11) {
+
+                    cpf =
+                        cpf.substring(0, 11);
+
+                }
+
+
+                cpf =
+                    cpf.replace(
+                        /(\d{3})(\d)/,
+                        "$1.$2"
+                    );
+
+
+                cpf =
+                    cpf.replace(
+                        /(\d{3})(\d)/,
+                        "$1.$2"
+                    );
+
+
+                cpf =
+                    cpf.replace(
+                        /(\d{3})(\d{1,2})$/,
+                        "$1-$2"
+                    );
+
+
+                this.value = cpf;
+
             }
-
-            cpf = cpf.replace(
-                /(\d{3})(\d)/,
-                "$1.$2"
-            );
-
-            cpf = cpf.replace(
-                /(\d{3})(\d)/,
-                "$1.$2"
-            );
-
-            cpf = cpf.replace(
-                /(\d{3})(\d{1,2})$/,
-                "$1-$2"
-            );
-
-            this.value = cpf;
-
-        });
+        );
 
 
-        // ================================
+        // ==========================================
         // VALIDAÇÃO DE CPF
-        // ================================
+        // ==========================================
 
         function validarCPF(cpf) {
 
-            cpf = cpf
-                .replace(/\D/g, "");
+            cpf =
+                cpf.replace(/\D/g, "");
+
 
             if (cpf.length !== 11) {
+
                 return false;
+
             }
 
-            // CPFs com todos os números iguais
+
             if (/^(\d)\1{10}$/.test(cpf)) {
+
                 return false;
+
             }
+
 
             let soma = 0;
             let resto;
 
-            for (let i = 1; i <= 9; i++) {
-                soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+
+            for (
+                let i = 1;
+                i <= 9;
+                i++
+            ) {
+
+                soma +=
+                    parseInt(
+                        cpf.substring(i - 1, i)
+                    ) *
+                    (11 - i);
+
             }
 
-            resto = (soma * 10) % 11;
 
-            if (resto === 10 || resto === 11) {
+            resto =
+                (soma * 10) % 11;
+
+
+            if (
+                resto === 10 ||
+                resto === 11
+            ) {
+
                 resto = 0;
+
             }
 
-            if (resto !== parseInt(cpf.substring(9, 10))) {
+
+            if (
+                resto !==
+                parseInt(
+                    cpf.substring(9, 10)
+                )
+            ) {
+
                 return false;
+
             }
+
 
             soma = 0;
 
-            for (let i = 1; i <= 10; i++) {
-                soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+
+            for (
+                let i = 1;
+                i <= 10;
+                i++
+            ) {
+
+                soma +=
+                    parseInt(
+                        cpf.substring(i - 1, i)
+                    ) *
+                    (12 - i);
+
             }
 
-            resto = (soma * 10) % 11;
 
-            if (resto === 10 || resto === 11) {
+            resto =
+                (soma * 10) % 11;
+
+
+            if (
+                resto === 10 ||
+                resto === 11
+            ) {
+
                 resto = 0;
+
             }
 
-            if (resto !== parseInt(cpf.substring(10, 11))) {
+
+            if (
+                resto !==
+                parseInt(
+                    cpf.substring(10, 11)
+                )
+            ) {
+
                 return false;
+
             }
+
 
             return true;
 
         }
 
 
-        // ================================
+        // ==========================================
         // FORMULÁRIO
-        // ================================
+        // ==========================================
 
-        const form = document.getElementById("briefingForm");
-
-
-        form.addEventListener("submit", function (event) {
-
-            event.preventDefault();
-
-
-            // Limpa erros anteriores
-
-            const campos = form.querySelectorAll(
-                "input, select"
+        const form =
+            document.getElementById(
+                "briefingForm"
             );
 
-            campos.forEach(function (campo) {
 
-                campo.classList.remove("error");
+        form.addEventListener(
+            "submit",
+            function (event) {
 
-            });
+                event.preventDefault();
 
 
-            // ================================
-            // VERIFICA CAMPOS OBRIGATÓRIOS
-            // ================================
+                // Remove erros anteriores
 
-            for (const campo of campos) {
-
-                if (!campo.value.trim()) {
-
-                    campo.classList.add("error");
-
-                    alert(
-                        "Por favor, preencha todos os campos obrigatórios."
+                const campos =
+                    form.querySelectorAll(
+                        "input, select"
                     );
 
-                    campo.focus();
+
+                campos.forEach(
+                    function (campo) {
+
+                        campo.classList.remove(
+                            "error"
+                        );
+
+                    }
+                );
+
+
+                // ==========================================
+                // CAMPOS OBRIGATÓRIOS
+                // ==========================================
+
+                for (
+                    const campo of campos
+                ) {
+
+                    if (
+                        !campo.value.trim()
+                    ) {
+
+                        campo.classList.add(
+                            "error"
+                        );
+
+
+                        alert(
+                            "Por favor, preencha todos os campos obrigatórios."
+                        );
+
+
+                        campo.focus();
+
+                        return;
+
+                    }
+
+                }
+
+
+                // ==========================================
+                // VALIDA CPF
+                // ==========================================
+
+                const cpf =
+                    document.getElementById(
+                        "cpf"
+                    ).value;
+
+
+                if (
+                    !validarCPF(cpf)
+                ) {
+
+                    cpfInput.classList.add(
+                        "error"
+                    );
+
+
+                    alert(
+                        "Digite um CPF válido."
+                    );
+
+
+                    cpfInput.focus();
 
                     return;
 
                 }
 
-            }
+
+                // ==========================================
+                // CAPTURA DOS DADOS
+                // ==========================================
+
+                const nome =
+                    document.getElementById(
+                        "nome"
+                    ).value.trim();
 
 
-            // ================================
-            // VALIDA CPF
-            // ================================
+                const empresa =
+                    document.getElementById(
+                        "empresa"
+                    ).value.trim();
 
-            const cpf = document.getElementById("cpf").value;
 
-            if (!validarCPF(cpf)) {
+                const motivo =
+                    document.getElementById(
+                        "motivo"
+                    ).value.trim();
 
-                cpfInput.classList.add("error");
 
-                alert(
-                    "Digite um CPF válido."
+                const dataVisita =
+                    document.getElementById(
+                        "dataVisita"
+                    ).value;
+
+
+                const embarcacao =
+                    document.getElementById(
+                        "embarcacao"
+                    ).value;
+
+
+                // ==========================================
+                // GUARDA OS DADOS TEMPORARIAMENTE
+                // ==========================================
+
+                const dadosVisitante = {
+
+                    nome: nome,
+
+                    cpf: cpf,
+
+                    empresa: empresa,
+
+                    motivo: motivo,
+
+                    dataVisita: dataVisita,
+
+                    embarcacao: embarcacao
+
+                };
+
+
+                sessionStorage.setItem(
+                    "dadosVisitante",
+                    JSON.stringify(
+                        dadosVisitante
+                    )
                 );
 
-                cpfInput.focus();
 
-                return;
+                // ==========================================
+                // ENVIA PARA O BRIEFING
+                // ==========================================
+
+                window.location.href =
+                    "briefing.html?embarcacao=" +
+                    encodeURIComponent(
+                        embarcacao
+                    );
 
             }
-
-
-            // ================================
-            // CAPTURA DOS DADOS
-            // ================================
-
-            const dados = {
-
-                nome:
-                    document.getElementById("nome").value.trim(),
-
-                cpf:
-                    document.getElementById("cpf").value.trim(),
-
-                empresa:
-                    document.getElementById("empresa").value.trim(),
-
-                motivo:
-                    document.getElementById("motivo").value.trim(),
-
-                dataVisita:
-                    document.getElementById("dataVisita").value,
-
-                embarcacao:
-                    document.getElementById("embarcacao").value
-
-            };
-
-
-            console.log(
-                "Dados do visitante:",
-                dados
-            );
-
-
-            // ================================
-            // TEMPORÁRIO
-            // ================================
-
-            alert(
-                "Dados preenchidos corretamente!"
-            );
-
-        });
+        );
 
     </script>
 
