@@ -141,11 +141,26 @@
             box-shadow: 0 6px 15px rgba(7, 86, 155, 0.25);
         }
 
+        .botao:disabled {
+            opacity: 1;
+        }
+
         .status {
             text-align: center;
             margin-top: 12px;
             color: #64748b;
             font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .sucesso {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .erro {
+            color: #b91c1c;
+            font-weight: bold;
         }
 
         @media (max-width: 600px) {
@@ -295,14 +310,15 @@
 
 
         // ==================================================
-        // VÍDEOS DAS EMBARCAÇÕES
+        // URL DA EDGE FUNCTION
         // ==================================================
-        //
-        // POR ENQUANTO SÃO LINKS DE TESTE.
-        //
-        // DEPOIS VAMOS COLOCAR OS LINKS REAIS
-        // DOS VÍDEOS DE CADA EMBARCAÇÃO.
-        //
+
+        const URL_EDGE_FUNCTION =
+            "https://pbvlngnboneecheojnpg.supabase.co/functions/v1/enviar-briefing";
+
+
+        // ==================================================
+        // VÍDEOS DAS EMBARCAÇÕES
         // ==================================================
 
         const videos = {
@@ -337,6 +353,8 @@
             status.textContent =
                 "Não foi possível identificar a embarcação.";
 
+            status.classList.add("erro");
+
         } else {
 
             nomeEmbarcacao.textContent =
@@ -358,6 +376,8 @@
                 status.textContent =
                     "Vídeo não cadastrado para esta embarcação.";
 
+                status.classList.add("erro");
+
             }
 
         }
@@ -367,11 +387,11 @@
         // TEMPORÁRIO
         // ==================================================
         //
-        // Nesta primeira versão, o botão será liberado
-        // para testarmos o funcionamento da página.
+        // Enquanto estamos usando o vídeo fictício,
+        // liberamos o botão após 5 segundos.
         //
-        // Depois vamos integrar o controle real do vídeo
-        // para liberar somente quando ele terminar.
+        // Depois vamos substituir pelo controle real
+        // de término do vídeo.
         //
         // ==================================================
 
@@ -390,16 +410,197 @@
 
 
         // ==================================================
-        // CONCLUIR
+        // CONCLUIR BRIEFING
         // ==================================================
 
         botaoConcluir.addEventListener(
             "click",
-            function () {
+            async function () {
 
-                alert(
-                    "Briefing concluído com sucesso!"
+                // Evita vários cliques
+                botaoConcluir.disabled = true;
+
+                botaoConcluir.classList.remove(
+                    "liberado"
                 );
+
+                botaoConcluir.textContent =
+                    "ENVIANDO...";
+
+                status.classList.remove(
+                    "sucesso",
+                    "erro"
+                );
+
+                status.textContent =
+                    "Registrando o briefing e enviando a confirmação...";
+
+
+                // ==================================================
+                // RECUPERA OS DADOS DO VISITANTE
+                // ==================================================
+
+                const dadosSalvos =
+                    sessionStorage.getItem(
+                        "dadosVisitante"
+                    );
+
+
+                if (!dadosSalvos) {
+
+                    status.textContent =
+                        "Não foi possível encontrar os dados preenchidos no formulário.";
+
+                    status.classList.add(
+                        "erro"
+                    );
+
+                    botaoConcluir.disabled = false;
+
+                    botaoConcluir.classList.add(
+                        "liberado"
+                    );
+
+                    botaoConcluir.textContent =
+                        "CONCLUIR BRIEFING";
+
+                    return;
+
+                }
+
+
+                try {
+
+                    const dadosVisitante =
+                        JSON.parse(
+                            dadosSalvos
+                        );
+
+
+                    // ==================================================
+                    // MONTA OS DADOS QUE SERÃO ENVIADOS
+                    // ==================================================
+
+                    const dadosBriefing = {
+
+                        nome:
+                            dadosVisitante.nome,
+
+                        cpf:
+                            dadosVisitante.cpf,
+
+                        empresa:
+                            dadosVisitante.empresa,
+
+                        motivo:
+                            dadosVisitante.motivo,
+
+                        data_visita:
+                            dadosVisitante.data_visita,
+
+                        embarcacao:
+                            embarcacao
+
+                    };
+
+
+                    console.log(
+                        "Dados enviados:",
+                        dadosBriefing
+                    );
+
+
+                    // ==================================================
+                    // ENVIA PARA A EDGE FUNCTION
+                    // ==================================================
+
+                    const resposta =
+                        await fetch(
+                            URL_EDGE_FUNCTION,
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        dadosBriefing
+                                    )
+                            }
+                        );
+
+
+                    // ==================================================
+                    // LÊ A RESPOSTA
+                    // ==================================================
+
+                    const resultado =
+                        await resposta.json();
+
+
+                    console.log(
+                        "Resposta da Edge Function:",
+                        resultado
+                    );
+
+
+                    // ==================================================
+                    // VERIFICA SE DEU CERTO
+                    // ==================================================
+
+                    if (
+                        resposta.ok &&
+                        resultado.sucesso === true
+                    ) {
+
+                        status.textContent =
+                            "Briefing concluído com sucesso! Os dados foram registrados e a confirmação foi enviada.";
+
+                        status.classList.add(
+                            "sucesso"
+                        );
+
+                        botaoConcluir.textContent =
+                            "BRIEFING CONCLUÍDO";
+
+                    } else {
+
+                        throw new Error(
+                            resultado.mensagem ||
+                            "Não foi possível concluir o briefing."
+                        );
+
+                    }
+
+
+                } catch (erro) {
+
+                    console.error(
+                        "Erro ao enviar briefing:",
+                        erro
+                    );
+
+                    status.textContent =
+                        "Não foi possível registrar o briefing. Tente novamente.";
+
+                    status.classList.add(
+                        "erro"
+                    );
+
+                    botaoConcluir.disabled =
+                        false;
+
+                    botaoConcluir.classList.add(
+                        "liberado"
+                    );
+
+                    botaoConcluir.textContent =
+                        "TENTAR NOVAMENTE";
+
+                }
 
             }
         );
