@@ -495,8 +495,10 @@
                         motivo:
                             dadosVisitante.motivo,
 
+                        // CORREÇÃO:
+                        // O index.html salva como "dataVisita"
                         data_visita:
-                            dadosVisitante.data_visita,
+                            dadosVisitante.dataVisita,
 
                         embarcacao:
                             embarcacao
@@ -569,6 +571,7 @@
                     } else {
 
                         throw new Error(
+                            resultado.erro ||
                             resultado.mensagem ||
                             "Não foi possível concluir o briefing."
                         );
